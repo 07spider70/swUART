@@ -11,12 +11,13 @@ SwUart::SwUart(PinName pinRx, PinName pinTx) {
 
     this->mReceiveBufIndex = 0;
     this->mReceiveBufLen = 0;
+    this->mReceiveByteBit = 0;
     for(int i =0; i < RECEIVE_BUFFER_SIZE; i++) {
         mReceiveBuffer[i] = 0;
     }
 
     this->mParity = NONE;
-    this->mReceiveState = START;
+    this->mReceiveState = WAIT;
 
     this->mBaudRate = 9600;
     this->mWaitTime = 0;
@@ -156,7 +157,7 @@ void SwUart::changeOnRx() {
         return;
     } 
 
-    for(int i = 7; i >= 0;i--) {
+    for(int i = 0; i <8 ;i++) {
         waitFull();
         mReceiveBuffer[mReceiveBufIndex] = setOrClearBit(mReceiveBuffer[mReceiveBufIndex],i,getRxPinStatus());
     }
@@ -175,7 +176,67 @@ void SwUart::changeOnRx() {
         }  
     }
 
-    
+/*
+    mReceiveTicker->detach();
+    switch(this->mReceiveState) {
+         
+        case WAIT: {
+            //pustim timer na kontrolu start bitu
+            mReceiveState = START;
+            mReceiveTicker->attach_us(callback(this, &SwUart::changeOnRx), this->mWaitTime/2);
+            break;
+        }
+        case START: {
+            //ideme vyhodnotit ci je nula
+            if(getRxPinStatus() != 0) {
+                mReceiveState = WAIT;
+            } else {
+                mReceiveState = DATA;
+                //spustime plny casovac
+                 mReceiveTicker->attach_us(callback(this, &SwUart::changeOnRx), this->mWaitTime);
+            } 
+            break;
+        }
+        case DATA: {
+            mReceiveBuffer[mReceiveBufIndex] = setOrClearBit(mReceiveBuffer[mReceiveBufIndex],
+                                                mReceiveByteBit,getRxPinStatus());
+            mReceiveByteBit++;
+            if(mReceiveByteBit >7) {
+                mReceiveByteBit = 0;
+                if(mParity == NONE) {
+                    mReceiveState = STOP;    
+                } else {
+                    mReceiveState = PARITY;
+                }
+                
+            }
+            mReceiveTicker->attach_us(callback(this, &SwUart::changeOnRx), this->mWaitTime);
+            break;
+        }
+
+        case PARITY: {
+            //nevyhodnocujeme zatial, len timer a zmenime stav
+            mReceiveState = STOP;   
+            mReceiveTicker->attach_us(callback(this, &SwUart::changeOnRx), this->mWaitTime);
+            break;
+        }
+        case STOP: {
+            
+            if(getRxPinStatus() == 1) {
+                
+                mReceiveBufLen++;
+                mReceiveBufIndex++;
+                if(mReceiveBufLen >= RECEIVE_BUFFER_SIZE) {
+                    mReceiveBufLen = 0; //neprecitali sme data, zmazeme ich a ideme odznova    
+                    mReceiveBufIndex = 0;
+                }  
+            }
+            mReceiveState = WAIT;
+
+            break;
+        }
+    }
+    */
     
 }
 

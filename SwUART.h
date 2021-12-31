@@ -10,6 +10,7 @@ namespace UART {
 
         public:
             typedef enum {
+                WAIT,
                 START,
                 DATA,
                 PARITY,
@@ -40,6 +41,7 @@ namespace UART {
             void sendChar(char data);
             void sendString(std::string data);
             void setStopBit(stopBitsCount conf);
+            void sendByte(uint8_t data);
         private:
 
             void setTxPinHigh();
@@ -53,7 +55,7 @@ namespace UART {
             void changeOnRx();
             uint8_t receiveByte(); //read byte from link
 
-            void sendByte(uint8_t data);
+            
 
             void computeWaitTime();
 
@@ -77,6 +79,7 @@ namespace UART {
             long mWaitTime;
             int mReceiveBufIndex;
             int mReceiveBufLen;
+            int mReceiveByteBit;
             uint8_t mReceiveBuffer[RECEIVE_BUFFER_SIZE];
 
     };

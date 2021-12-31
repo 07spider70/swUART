@@ -11,15 +11,17 @@ int main()
     SwUart swUart(PA_1,PA_2);
     swUart.init();
     while (true) {
-        //swUart.sendString("hello\n\r");
+        //swUart.sendChar('a');
+        
         if(swUart.avaible()) {
-            printf("data incom: \n\r");
+            //printf("data incom: \n\r");
             while(swUart.avaible()) {
-                printf("%c\n\r",(char)swUart.readByte());
+                swUart.sendByte(swUart.readByte());
+                //printf("znak: %c\n\r", (char) swUart.readByte());
             }
             printf("\n\r");
         }
-       // ThisThread::sleep_for(5s);
+       //ThisThread::sleep_for(5s);
     }
 }
 
