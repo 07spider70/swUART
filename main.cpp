@@ -19,7 +19,7 @@ int main()
                 swUart.sendByte(swUart.readByte());
                 //printf("znak: %c\n\r", (char) swUart.readByte());
             }
-            printf("\n\r");
+            //printf("\n\r");
         }
        //ThisThread::sleep_for(5s);
     }

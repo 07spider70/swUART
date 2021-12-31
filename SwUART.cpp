@@ -16,7 +16,7 @@ SwUart::SwUart(PinName pinRx, PinName pinTx) {
         mReceiveBuffer[i] = 0;
     }
 
-    this->mParity = NONE;
+    this->mParity = EVEN;
     this->mReceiveState = WAIT;
 
     this->mBaudRate = 9600;
@@ -164,7 +164,40 @@ void SwUart::changeOnRx() {
 
     if(this->mParity != NONE) {
         waitFull();
+        //zisti paritu
+        uint8_t n = mReceiveBuffer[mReceiveBufIndex];
+        int count = 0;
+        while (n) {
+            count += n & 1;
+            n >>= 1;
+        }
+        //zisti aka ma byt parita 
+        bool set = false;
+        switch(this->mParity) {
+            case NONE:
+                break;
+            case EVEN:
+                if(count%2 == 0) {
+                    set = false;
+                } else {
+                    set = true;
+                }
+                break;
+
+            case ODD:
+                if(count%2 != 0) {
+                    set = false;
+                } else {
+                    set = true;
+                }
+                break;
+        }
         //porovna paritu
+        if(getRxPinStatus() == set) {
+            //parita je ok
+        } else {
+            return;
+        }
     }
 
     waitFull();
@@ -174,6 +207,8 @@ void SwUart::changeOnRx() {
         if(mReceiveBufLen >= RECEIVE_BUFFER_SIZE) {
             mReceiveBufLen = 0; //neprecitali sme data, zmazeme ich a ideme odznova    
         }  
+    } else {
+        return;
     }
 
 /*
@@ -301,7 +336,7 @@ void SwUart::sendByte(uint8_t data) {
 }
 
 uint8_t SwUart::readByte() {
-    printf("size of avaib data: %d\n\r", mReceiveBufIndex);
+    //printf("size of avaib data: %d\n\r", mReceiveBufIndex);
     uint8_t retVal = 0;
     if(avaible()) {
         retVal = mReceiveBuffer[mReceiveBufLen-1];
