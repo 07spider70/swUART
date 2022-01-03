@@ -10,14 +10,6 @@ namespace UART {
 
         public:
             typedef enum {
-                WAIT,
-                START,
-                DATA,
-                PARITY,
-                STOP
-            } receiveState;
-
-            typedef enum {
                 EVEN,
                 ODD,
                 NONE
@@ -35,12 +27,14 @@ namespace UART {
 
             void init();
             void setParity(parityType parity=NONE);
-            bool setBaudrate(int baud);
+            void setStopBit(stopBitsCount conf=ONE);
+            //nepouzite
+            //bool setBaudrate(int baud);
             bool avaible();
             uint8_t readByte();
             void sendChar(char data);
             void sendString(std::string data);
-            void setStopBit(stopBitsCount conf);
+            
             void sendByte(uint8_t data);
         private:
 
@@ -64,16 +58,15 @@ namespace UART {
 
             void custWait(long waitTime);
             bool getBit(uint8_t byte, int position);
+            uint8_t setOrClearBit(uint8_t variable, uint8_t bit_position, uint8_t setOrClear);
+
 
 
         private:
             DigitalOut* mTxPin;
             DigitalIn* mRxPin;
-            Ticker* mTransmitTicker;
-            Ticker* mReceiveTicker;
             InterruptIn* mReceiveInt;
             parityType mParity;
-            receiveState mReceiveState;
             stopBitsCount mStopBit;
             int mBaudRate;
             long mWaitTime;

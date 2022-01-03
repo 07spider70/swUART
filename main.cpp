@@ -9,9 +9,10 @@ using namespace UART;
 int main()
 {
     SwUart swUart(PA_1,PA_2);
+    //swUart.setBaudrate(9600);
     swUart.init();
     while (true) {
-        //swUart.sendChar('a');
+        swUart.sendString("Ahoj, ako sa mas?\n\r");
         
         if(swUart.avaible()) {
             //printf("data incom: \n\r");
@@ -21,7 +22,7 @@ int main()
             }
             //printf("\n\r");
         }
-       //ThisThread::sleep_for(5s);
+       ThisThread::sleep_for(5s);
     }
 }
 

@@ -4,8 +4,6 @@ SwUart::SwUart(PinName pinRx, PinName pinTx) {
     this->mTxPin = new DigitalOut(pinTx);
     this->mRxPin = new DigitalIn(pinRx);
 
-    this->mTransmitTicker = new Ticker();
-    this->mReceiveTicker = new Ticker();
     this->mReceiveInt = new InterruptIn(pinRx);
 
 
@@ -16,8 +14,8 @@ SwUart::SwUart(PinName pinRx, PinName pinTx) {
         mReceiveBuffer[i] = 0;
     }
 
-    this->mParity = EVEN;
-    this->mReceiveState = WAIT;
+    this->mParity = NONE;
+   
 
     this->mBaudRate = 9600;
     this->mWaitTime = 0;
@@ -28,14 +26,6 @@ SwUart::SwUart(PinName pinRx, PinName pinTx) {
 SwUart::~SwUart() {
     if(this->mReceiveInt) {
         delete this->mReceiveInt;
-    }
-
-    if(this->mReceiveTicker) {
-        delete this->mReceiveTicker;
-    }
-
-    if(this->mTransmitTicker) {
-        delete this->mTransmitTicker;
     }
 
     if(this->mRxPin) {
@@ -60,7 +50,7 @@ void SwUart::setParity(parityType parity) {
     
     this->mParity = parity;
 }
-
+/*
 bool SwUart::setBaudrate(int baud) {
     if(baud > 256000 || baud <= 0) {
         this->mBaudRate = 9600;
@@ -69,7 +59,7 @@ bool SwUart::setBaudrate(int baud) {
     this->mBaudRate = baud;
     return true;
 }
-
+*/
 void SwUart::setStopBit(stopBitsCount conf) {
     this->mStopBit = conf;
 }
@@ -140,7 +130,7 @@ void SwUart::sendStopBit() {
     
 }
 
-uint8_t setOrClearBit(uint8_t variable, uint8_t bit_position, uint8_t setOrClear)
+uint8_t SwUart::setOrClearBit(uint8_t variable, uint8_t bit_position, uint8_t setOrClear)
 {
     if(setOrClear) {
         variable |= (1<<bit_position); 
@@ -210,68 +200,6 @@ void SwUart::changeOnRx() {
     } else {
         return;
     }
-
-/*
-    mReceiveTicker->detach();
-    switch(this->mReceiveState) {
-         
-        case WAIT: {
-            //pustim timer na kontrolu start bitu
-            mReceiveState = START;
-            mReceiveTicker->attach_us(callback(this, &SwUart::changeOnRx), this->mWaitTime/2);
-            break;
-        }
-        case START: {
-            //ideme vyhodnotit ci je nula
-            if(getRxPinStatus() != 0) {
-                mReceiveState = WAIT;
-            } else {
-                mReceiveState = DATA;
-                //spustime plny casovac
-                 mReceiveTicker->attach_us(callback(this, &SwUart::changeOnRx), this->mWaitTime);
-            } 
-            break;
-        }
-        case DATA: {
-            mReceiveBuffer[mReceiveBufIndex] = setOrClearBit(mReceiveBuffer[mReceiveBufIndex],
-                                                mReceiveByteBit,getRxPinStatus());
-            mReceiveByteBit++;
-            if(mReceiveByteBit >7) {
-                mReceiveByteBit = 0;
-                if(mParity == NONE) {
-                    mReceiveState = STOP;    
-                } else {
-                    mReceiveState = PARITY;
-                }
-                
-            }
-            mReceiveTicker->attach_us(callback(this, &SwUart::changeOnRx), this->mWaitTime);
-            break;
-        }
-
-        case PARITY: {
-            //nevyhodnocujeme zatial, len timer a zmenime stav
-            mReceiveState = STOP;   
-            mReceiveTicker->attach_us(callback(this, &SwUart::changeOnRx), this->mWaitTime);
-            break;
-        }
-        case STOP: {
-            
-            if(getRxPinStatus() == 1) {
-                
-                mReceiveBufLen++;
-                mReceiveBufIndex++;
-                if(mReceiveBufLen >= RECEIVE_BUFFER_SIZE) {
-                    mReceiveBufLen = 0; //neprecitali sme data, zmazeme ich a ideme odznova    
-                    mReceiveBufIndex = 0;
-                }  
-            }
-            mReceiveState = WAIT;
-
-            break;
-        }
-    }
-    */
     
 }
 
