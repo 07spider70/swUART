@@ -13,6 +13,20 @@ static DigitalOut led2(LED2);
 // Create a BufferedSerial object with a default baud rate.
 static BufferedSerial serial_port(PB_6, PB_7);
 
+string convertToString(char* a, int size)
+{
+    int i;
+    string s = "";
+    for (i = 0; i < size; i++) {
+        if(a[i] == 0) {
+            return s;
+        }
+        s = s + a[i];
+    }
+    return s;
+}
+
+
 int main()
 {
 
@@ -26,24 +40,26 @@ int main()
 
     // Application buffer to receive the data
     char buf[MAXIMUM_BUFFER_SIZE] = {0};
-    char bufSend[1] = {0};
 
     SwUart swUart(PA_1,PA_2);
     //swUart.setBaudrate(9600);
     swUart.init();
     while (true) {
-        swUart.sendString("o");
+        swUart.sendString("hello");
         
         if (uint32_t num = serial_port.read(buf, sizeof(buf))) {
-            if(buf[0] == 'o') {
+            string recData =  convertToString(buf, sizeof(buf));
+           
+            if(recData == "hello") {
                  led = !led;
             }
         }
-        bufSend[0] = {'a'};
 
-        serial_port.write(bufSend,1);
+        string swData = "ahoj";
+        serial_port.write(swData.c_str(),swData.length());
         while(swUart.avaible()) {
-            if(swUart.readByte() == 'a') {
+            string rec = swUart.readString();
+            if(rec == "ahoj") {
                 led2 = !led2;
             }
         }

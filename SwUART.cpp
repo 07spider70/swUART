@@ -130,6 +130,13 @@ void SwUart::sendStopBit() {
     
 }
 
+std::string SwUart::readString() {
+    string ret = "";
+    while(avaible()) {
+        ret.insert(0, 1,(char)readByte());
+    }
+    return ret;
+}
 uint8_t SwUart::setOrClearBit(uint8_t variable, uint8_t bit_position, uint8_t setOrClear)
 {
     if(setOrClear) {

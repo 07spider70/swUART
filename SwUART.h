@@ -34,7 +34,7 @@ namespace UART {
             uint8_t readByte();
             void sendChar(char data);
             void sendString(std::string data);
-            
+            std::string readString();
             void sendByte(uint8_t data);
         private:
 
