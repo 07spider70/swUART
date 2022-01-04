@@ -57,7 +57,7 @@ int main()
 
         string swData = "ahoj";
         serial_port.write(swData.c_str(),swData.length());
-        while(swUart.avaible()) {
+        while(swUart.available()) {
             string rec = swUart.readString();
             if(rec == "ahoj") {
                 led2 = !led2;

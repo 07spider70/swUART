@@ -30,7 +30,7 @@ namespace UART {
             void setStopBit(stopBitsCount conf=ONE);
             //nepouzite
             //bool setBaudrate(int baud);
-            bool avaible();
+            bool available();
             uint8_t readByte();
             void sendChar(char data);
             void sendString(std::string data);

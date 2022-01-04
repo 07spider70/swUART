@@ -10,10 +10,8 @@ SwUart::SwUart(PinName pinRx, PinName pinTx) {
     this->mReceiveBufIndex = 0;
     this->mReceiveBufLen = 0;
     this->mReceiveByteBit = 0;
-    for(int i =0; i < RECEIVE_BUFFER_SIZE; i++) {
-        mReceiveBuffer[i] = 0;
-    }
 
+    memset(mReceiveBuffer, 0, RECEIVE_BUFFER_SIZE);
     this->mParity = NONE;
    
 
@@ -98,7 +96,7 @@ void SwUart::custWait(long waitTime) {
     }
 }
 
-bool SwUart::avaible() {
+bool SwUart::available() {
     if(this->mReceiveBufLen > 0) {
         return true;
     } 
@@ -132,7 +130,7 @@ void SwUart::sendStopBit() {
 
 std::string SwUart::readString() {
     string ret = "";
-    while(avaible()) {
+    while(available()) {
         ret.insert(0, 1,(char)readByte());
     }
     return ret;
@@ -273,7 +271,7 @@ void SwUart::sendByte(uint8_t data) {
 uint8_t SwUart::readByte() {
     //printf("size of avaib data: %d\n\r", mReceiveBufIndex);
     uint8_t retVal = 0;
-    if(avaible()) {
+    if(available()) {
         retVal = mReceiveBuffer[mReceiveBufLen-1];
         mReceiveBufIndex--;
         mReceiveBufLen--;
